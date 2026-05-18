@@ -1,0 +1,101 @@
+data test0;
+infile '/home/u64470274/sasuser.v94/Datafile/장애인복지만족도.txt';
+input id gender age edu year month a1-a5 b1-b5 c1-c5 sat v11 v12;
+
+array q a1-a5 b1-b5 c1-c5 sat v11 v12 gender;
+do over q;
+	if q=9 then q=.;
+	end;
+run;
+
+proc print data=test0;
+run;
+
+data test1;
+set test0;
+aa=(a1+a2+a3+a4+a5)/5;
+bb=(b1+b2+b3+b4+b5)/5;
+cc=(c1+c2+c3+c4+c5)/5;
+
+if sat >= 4 then sat_g = 'Group_High';
+    else if 1 <= sat < 4 then sat_g = 'Group_Low';
+run;
+proc print data=test1;
+run;
+
+
+
+/* 표본 정렬 */
+proc sort data=test1;
+    by sat_g;
+run;
+
+
+/* 그룹별 정규성 검정 실시 */
+proc univariate data=test1 normal;
+    by sat_g;
+    var aa;
+run;
+
+
+proc ttest data=test1;
+    class sat_g;
+    var aa;
+run;
+
+
+
+
+
+
+
+
+
+/* 2번 */
+
+data test0;
+infile '/home/u64470274/sasuser.v94/Datafile/장애인복지만족도.txt';
+input id gender age edu year month a1-a5 b1-b5 c1-c5 sat v11 v12;
+
+array q a1-a5 b1-b5 c1-c5 sat v11 v12 gender;
+do over q;
+	if q=9 then q=.;
+	end;
+run;
+
+proc print data=test0;
+run;
+
+data test2;
+set test0;
+aa=(a1+a2+a3+a4+a5)/5;
+bb=(b1+b2+b3+b4+b5)/5;
+cc=(c1+c2+c3+c4+c5)/5;
+
+if sat >= 4 then sat_g = 'Group_High';
+    else if 1 <= sat < 4 then sat_g = 'Group_Low';
+
+if age>=30;
+run;
+
+
+
+/* 표본 정렬 */
+proc sort data=test2;
+    by sat_g;
+run;
+
+
+/* 그룹별 정규성 검정 실시 */
+proc univariate data=test2 normal;
+    by sat_g;
+    var aa;
+run;
+
+
+proc ttest data=test2;
+    class sat_g;
+    var aa;
+run;
+
+
