@@ -15,9 +15,10 @@ run;
 
 data test1;
 set test0;
-aa=(a1+a2+a3+a4+a5)/5;
-bb=(b1+b2+b3+b4+b5)/5;
-cc=(c1+c2+c3+c4+c5)/5;
+aa=(a1+a2+a3+a4+a5)/5; /*의료만족도*/
+bb=(b1+b2+b3+b4+b5)/5; /*교육만족도*/
+cc=(c1+c2+c3+c4+c5)/5; /*경제만족도*/
+tot_mean=(aa+bb+cc)/3; /* 전체만족도*/
 run;
 proc print data=test1;
 run;
@@ -59,10 +60,52 @@ run;
 
 data test4;
 set test1;
-if 0 < year*12+month < 7*12 then year_n = 1;
-else if year*12+month > 10*12 then year_n=3;
-else year_n=.;
+
+tot=year*12+month;
+if tot=0 then tot=.;
+if 0 < tot <= 7*12 then tot_i = 1;
+else if tot >= 10*12 then tot_i =2;
+else tot_i=.;
 run;
 
-proc test4
+proc ttest data=test4;
+class tot_i;
+var aa;
+run;
+
+
+/*  
+등분산 검정에서 (f)값은 (1.07)이고, 유의확률은 (0.7154)이므므로 등분산을 만족한다. 
+검정통계량 (t)값ㄴ은 (-3.34)이고, 유의확률은 (0.001)이다. 
+다유의확률이 유의수준보다(작으)므로 로귀무가설을 (기각)한ㄷ다.
+그러므로, 장애기간이 7년 이하인 집단과 10년이상인 집단간에 의료만족도가 (ㄷㅏ르다)고 할 수 있다. 
+
+*/
+
+
+
+/*  
+[7번문제]
+교육 만족도가 복지만족도에 영향을 미친다는 주장을 단수선형회귀분석을 통해 유의수준 5%에서 거설을 검정하시오.
+
+귀무 : 교육만족도가 복지만족도에 영향을 미치지 않는다.
+대립 : 교육만족도가 복지만족도에 영향을 미친다. 
+유의수준 5% 
+
+=> t검정의 결과를 써야함 (f결과말고!)
+*/
+
+proc reg data=test1;
+model sat=bb;
+run;
+
+
+/*  
+검정통계량 (t)값은 (6.93)이고, 고유의확률은 (0.0001)이다. 
+유의확률이 유의수준5%보다 작으므로 귀무가설을 기각한다. 
+그러므로 교육만족도는 복지만족도에 영향을 미친다고 할 수 있다.
+
+*/
+
+
 
