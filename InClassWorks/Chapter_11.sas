@@ -10,10 +10,6 @@ proc print data=recycle;
 run;
 
 
-data recycle;
-array q id a1-a3 b1-b7 c1-c10 gender$ learning race;
-do over q;
- IF q=
 /*  
 <다음 문제는 꼭 낸다고 하심!>
 : using freq!
@@ -145,5 +141,88 @@ b7='재활용품을 정리해서 집앞에 내놓는 일'*F=3.0, (gender ALL='�
 
 
 /*  */
+
+
+proc freq data=r2;
+format gender $f_gender. learning $f_learning.;
+tables gender*learning;
+run;
+
+
+
+/* 문항 신뢰도 : 크론바흐 알파계수 
+
+proc coor data=파일명 ALPHA;
+var 변수명1 변수명2 변수명3;
+run;
+
+크론바흐 알파계수
+(-) : 순서를 반대로 생각하기
+(0) : 이 답변을 신뢰할 수 없다.
+(1에 가까움) : 이 답변을 신뢰할 수 있다.  
+
+[옵션]
+ALPHA : 크론바흐 알파계수
+NOSINPLE : 기술 통계량 제어
+NOCORR : 피어슨 상관계수 출력제어
+
+proc corr data=r2 nosimple nocorr alpha;
+var c1-c10;
+run
+
+- 알파계수에서 원데이터 표준화중 더 큰값을 사용!
+- 만약 제거했을 때 알파가 크론바흐 알파계수보다 더 크면, 그거를 없애거나(0에 가까움+제거했을 떄 더 높아짐) 혹은 (-)면 역으로 바꿔야 한다.
+=> c1과 c4변수가 음의 값을 가짐.
+
+: 역으로 바꿔줌.
+data aa;
+set r2;
+c1= 6-c1;
+c4= 6 -c4;
+*교수님은 앞에 r 을 붙여서 rc1 rc4등으로 하라고 하심. (나중에 헷갈릴수도 있음.)
+
+
+proc corr data=aa nosimple nocorr alpha;
+var c1-c10;
+run;
+
+*/
+
+proc corr data= alpha
+
+
+/* 정규성 검정 
+
+proc sort data=bb;
+by gender;
+run;
+
+proc univariate data=bb normal plot;
+var c_all;
+by gender;
+run;
+
+
+=> 정규성 검정을 했을 떄 0.05보다 커야함! (혹은 )
+*/
+
+
+
+/*  
+등분산 검정
+
+proc ttest data=bb;
+class gender;
+var c_all;
+run;
+
+=> 이것도 0.05보다 커야함. 
+
+*/
+
+
+
+
+
 
 
